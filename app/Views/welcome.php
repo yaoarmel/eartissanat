@@ -1,55 +1,35 @@
-<?php require_once __DIR__ . '/layouts/header.php'; ?>
+<?php
+use App\Core\View;
+
+if (!function_exists('partial')) {
+    function partial($name, $data = []) {
+        View::partial($name, $data);
+    }
+}
+?>
 
 <!-- Hero Section -->
-<main class="flex-grow">
-    <section class="relative overflow-hidden rounded-3xl lg:w-[78%] w-[90%] mx-auto mt-6">
-        <img src="/assets/img/happy.png" alt="Confetti" class="absolute top-2 right-2 w-11 z-10">
-        <img src="/assets/img/hero.png" alt="Marché artisanal ivoirien"
-             loading="lazy" class="w-full h-64 md:h-96 object-cover">
-        <a href="#"
-           class="absolute top-4 left-4 bg-green-600 text-white font-semibold px-4 py-2 rounded hover:bg-green-700 shadow-md flex items-center gap-2 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            J'en profite
-        </a>
-    </section>
+<section class="relative overflow-hidden rounded-3xl lg:w-[78%] w-[90%] mx-auto mt-6">
+    <img src="/assets/img/happy.png" alt="Confetti" class="absolute top-2 right-2 w-11 z-10">
+    <img src="/assets/img/hero.png" alt="Marché artisanal ivoirien"
+            loading="lazy" class="w-full h-64 md:h-96 object-cover">
+    <a href="/products"
+        class="absolute top-4 left-4 bg-green-600 text-white font-semibold px-4 py-2 rounded hover:bg-green-700 shadow-md flex items-center gap-2 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        Découvrir nos produits
+    </a>
+</section>
 
-    <!-- Titre -->
-    <section class="w-full sm:w-[70%] mx-auto mt-12 mb-6 px-4">
-        <h2 class="text-3xl font-bold text-center text-gray-800 bg-gray-300 py-4 rounded-full">
-            Richesses ivoiriennes
-        </h2>
-    </section>
+<!-- Statistiques -->
+<?php partial('stats', ['stats' => $stats]); ?>
 
-    <!-- Galerie de Cartes -->
-    <section class="w-full sm:w-[70%] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-        <?php foreach ($categories as $category): ?>
-        <a href="/products/<?= htmlspecialchars($category['slug']) ?>">
-            <article class="text-center">
-                <img src="<?= htmlspecialchars($category['image_url']) ?>" 
-                     alt="<?= htmlspecialchars($category['name']) ?>"
-                     loading="lazy"
-                     class="w-[80%] mx-auto object-cover rounded-[40px] transition-transform duration-300 hover:scale-105">
-                <p class="mt-3 px-4 py-2 bg-gray-200 font-semibold rounded-full w-max mx-auto">
-                    <?= htmlspecialchars($category['name']) ?>
-                </p>
-            </article>
-        </a>
-        <?php endforeach; ?>
-    </section>
+<!-- Catégories -->
+<?php partial('categories', ['categories' => $categories]); ?>
 
-    <!-- Newsletter -->
-    <section class="w-full sm:w-[70%] mx-auto px-4 mt-16 text-center">
-        <h3 class="text-xl font-bold mb-4">Recevez nos nouveautés</h3>
-        <form action="/newsletter/subscribe" method="POST" class="flex flex-col sm:flex-row gap-4 justify-center">
-            <input type="email" name="email" placeholder="Votre email" required
-                   class="px-4 py-2 rounded border border-gray-300 w-full sm:w-auto">
-            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
-                S'abonner
-            </button>
-        </form>
-    </section>
-</main>
+<!-- Produits en vedette -->
+<?php partial('featured-products', ['products' => $featured_products]); ?>
 
-<?php require_once __DIR__ . '/layouts/footer.php'; ?> 
+<!-- Newsletter -->
+<?php partial('newsletter'); ?>

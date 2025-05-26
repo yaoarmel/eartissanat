@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Si le fichier ou dossier n'existe pas physiquement
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Autoriser l'accès aux ressources statiques
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+    Require all granted
+</FilesMatch> 

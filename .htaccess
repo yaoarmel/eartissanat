@@ -1,0 +1,35 @@
+RewriteEngine On
+
+# Rediriger tout le trafic vers le dossier public
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ public/$1 [L]
+
+# Si le fichier ou dossier n'existe pas physiquement dans public
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^public/(.*)$ public/index.php [QSA,L]
+
+# Autoriser l'accès aux ressources statiques
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+    Require all granted
+</FilesMatch>
+
+# Protection des fichiers sensibles
+<FilesMatch "(^\.|composer\.(json|lock)|\.env|\.gitignore)$">
+    Require all denied
+</FilesMatch>
+
+# Empêcher l'accès direct aux fichiers .html dans le dossier docs
+<FilesMatch "\.html$">
+    Require all denied
+</FilesMatch>
+
+# Empêcher l'accès au dossier docs
+<IfModule mod_rewrite.c>
+    RewriteRule ^docs/ - [F,L]
+</IfModule>
+
+# Compression GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript
+</IfModule> 

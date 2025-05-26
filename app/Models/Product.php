@@ -23,9 +23,10 @@ class Product
             JOIN products_categories c ON p.category_id = c.id
             JOIN authors a ON p.author_id = a.id
             JOIN users u ON a.user_id = u.id
-            WHERE p.id = ?
+            WHERE p.id = :id
         ');
-        $stmt->execute([$id]);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -42,17 +43,17 @@ class Product
         ';
         
         if ($limit !== null) {
-            $sql .= ' LIMIT ? OFFSET ?';
+            $sql .= ' LIMIT :limit OFFSET :offset';
         }
 
         $stmt = $this->db->prepare($sql);
         
         if ($limit !== null) {
-            $stmt->execute([$limit, $offset]);
-        } else {
-            $stmt->execute();
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         }
-
+        
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -65,19 +66,23 @@ class Product
             JOIN products_categories c ON p.category_id = c.id
             JOIN authors a ON p.author_id = a.id
             JOIN users u ON a.user_id = u.id
-            WHERE p.category_id = ?
+            WHERE p.category_id = :category_id
             ORDER BY p.created_at DESC
         ';
 
         if ($limit !== null) {
-            $sql .= ' LIMIT ? OFFSET ?';
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$categoryId, $limit, $offset]);
-        } else {
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$categoryId]);
+            $sql .= ' LIMIT :limit OFFSET :offset';
         }
 
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        
+        if ($limit !== null) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
+        
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -87,10 +92,11 @@ class Product
             SELECT p.*, c.name as category_name
             FROM products p
             JOIN products_categories c ON p.category_id = c.id
-            WHERE p.author_id = ?
+            WHERE p.author_id = :author_id
             ORDER BY p.created_at DESC
         ');
-        $stmt->execute([$authorId]);
+        $stmt->bindValue(':author_id', $authorId, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -99,19 +105,21 @@ class Product
         $stmt = $this->db->prepare('
             INSERT INTO products (name, description, price, stock, category_id, img_url, 
                                 dimensions, origin, author_id, material)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (:name, :description, :price, :stock, :category_id, :img_url, 
+                    :dimensions, :origin, :author_id, :material)
         ');
+        
         return $stmt->execute([
-            $data['name'],
-            $data['description'],
-            $data['price'],
-            $data['stock'] ?? null,
-            $data['category_id'],
-            $data['img_url'],
-            $data['dimensions'] ?? 'N/A',
-            $data['origin'] ?? 'N/A',
-            $data['author_id'],
-            $data['material'] ?? 'N/A'
+            ':name' => $data['name'],
+            ':description' => $data['description'],
+            ':price' => $data['price'],
+            ':stock' => $data['stock'] ?? null,
+            ':category_id' => $data['category_id'],
+            ':img_url' => $data['img_url'],
+            ':dimensions' => $data['dimensions'] ?? 'N/A',
+            ':origin' => $data['origin'] ?? 'N/A',
+            ':author_id' => $data['author_id'],
+            ':material' => $data['material'] ?? 'N/A'
         ]);
     }
 
@@ -152,9 +160,53 @@ class Product
     {
         $stmt = $this->db->prepare('
             UPDATE products 
-            SET stock = stock - ? 
-            WHERE id = ? AND (stock - ?) >= 0
+            SET stock = stock - :quantity 
+            WHERE id = :id AND (stock - :quantity) >= 0
         ');
-        return $stmt->execute([$quantity, $id, $quantity]);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function getFeaturedProducts($limit = 8)
+    {
+        $sql = '
+            SELECT p.*, c.name as category_name, a.user_id as author_user_id,
+                   u.first_name as author_first_name, u.last_name as author_last_name
+            FROM products p
+            JOIN products_categories c ON p.category_id = c.id
+            JOIN authors a ON p.author_id = a.id
+            JOIN users u ON a.user_id = u.id
+            WHERE a.is_verified = 1
+            ORDER BY p.created_at DESC
+            LIMIT :limit
+        ';
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getProductCountByCategory($categoryId)
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM products WHERE category_id = :category_id');
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function getTotalProductsByCategory($categoryId)
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM products WHERE category_id = :category_id');
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function getTotalProducts()
+    {
+        $stmt = $this->db->query('SELECT COUNT(*) FROM products');
+        return $stmt->fetchColumn();
     }
 } 

@@ -1,6 +1,7 @@
-<?php require_once __DIR__ . '/../layouts/header.php'; ?>
-
-<main class="flex-grow">
+<?php
+// Contenu de la page
+?>
+<div class="container mx-auto px-4 py-8">
     <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
             <div>
@@ -115,7 +116,7 @@
             </form>
         </div>
     </div>
-</main>
+</div>
 
 <script>
 function toggleArtisanFields(show) {
@@ -128,6 +129,4 @@ function toggleArtisanFields(show) {
         field.required = show;
     });
 }
-</script>
-
-<?php require_once __DIR__ . '/../layouts/footer.php'; ?> 
+</script> 

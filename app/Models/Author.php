@@ -20,16 +20,18 @@ class Author
             SELECT a.*, u.first_name, u.last_name, u.email, u.phone_number 
             FROM authors a
             JOIN users u ON a.user_id = u.id
-            WHERE a.id = ?
+            WHERE a.id = :id
         ');
-        $stmt->execute([$id]);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getAuthorByUserId($userId)
     {
-        $stmt = $this->db->prepare('SELECT * FROM authors WHERE user_id = ?');
-        $stmt->execute([$userId]);
+        $stmt = $this->db->prepare('SELECT * FROM authors WHERE user_id = :user_id');
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -37,15 +39,15 @@ class Author
     {
         $stmt = $this->db->prepare('
             INSERT INTO authors (user_id, bio, website, social_media_links, key_words, photo_url) 
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (:user_id, :bio, :website, :social_media_links, :key_words, :photo_url)
         ');
         return $stmt->execute([
-            $data['user_id'],
-            $data['bio'] ?? null,
-            $data['website'] ?? null,
-            $data['social_media_links'] ? json_encode($data['social_media_links']) : null,
-            $data['key_words'] ?? null,
-            $data['photo_url'] ?? ''
+            ':user_id' => $data['user_id'],
+            ':bio' => $data['bio'] ?? null,
+            ':website' => $data['website'] ?? null,
+            ':social_media_links' => $data['social_media_links'] ? json_encode($data['social_media_links']) : null,
+            ':key_words' => $data['key_words'] ?? null,
+            ':photo_url' => $data['photo_url'] ?? ''
         ]);
     }
 
@@ -104,7 +106,61 @@ class Author
 
     public function verifyAuthor($id)
     {
-        $stmt = $this->db->prepare('UPDATE authors SET is_verified = 1 WHERE id = ?');
-        return $stmt->execute([$id]);
+        $stmt = $this->db->prepare('UPDATE authors SET is_verified = 1 WHERE id = :id');
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function getTotalVerifiedAuthors()
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM authors WHERE is_verified = 1');
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function getPendingVerificationsCount()
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM authors WHERE is_verified = 0');
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function getAuthorsWithDetails($status = 'all', $page = 1, $perPage = 10)
+    {
+        $offset = ($page - 1) * $perPage;
+        $where = '';
+        
+        if ($status === 'pending') {
+            $where = 'WHERE a.is_verified = 0';
+        } elseif ($status === 'verified') {
+            $where = 'WHERE a.is_verified = 1';
+        }
+
+        $sql = "
+            SELECT a.*, u.first_name, u.last_name, u.email
+            FROM authors a
+            JOIN users u ON a.user_id = u.id
+            $where
+            ORDER BY a.created_at DESC
+            LIMIT ? OFFSET ?
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$perPage, $offset]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getTotalAuthors($status = 'all')
+    {
+        $where = '';
+        if ($status === 'pending') {
+            $where = 'WHERE is_verified = 0';
+        } elseif ($status === 'verified') {
+            $where = 'WHERE is_verified = 1';
+        }
+
+        $sql = "SELECT COUNT(*) FROM authors $where";
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchColumn();
     }
 } 
