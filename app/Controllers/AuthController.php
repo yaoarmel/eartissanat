@@ -2,70 +2,107 @@
 
 namespace App\Controllers;
 
-use App\Models\UserModel;
-
+use App\Models\User;
+use App\Models\Author;
+use Core\Session;
 
 class AuthController
 {
-    public function login_view(string $title)
+    private User $userModel;
+    private Author $authorModel;
+
+    public function __construct()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $number = str_replace(' ', '', trim($_POST['phone_number']));
-            $password = $_POST['password'];
-           
-
-            // Validate the input data
-            if (empty($number) || empty($password)) {
-                echo "All fields are required.";
-                return;
-            }
-
-            // Check user credentials
-            $userModel = new UserModel();
-            if ($userModel->login($number, $password)) {
-                // Set session variables or cookies as needed
-                session_start();
-                $_SESSION['user'] = $userModel->get_user($number); 
-                header('Location: /compte');
-                exit();
-            } else {
-                echo "Invalid phone number or password.";
-            }
-        }
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/forms/forms_login_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
+        $this->userModel = new User();
+        $this->authorModel = new Author();
     }
 
-    public function register_view(string $title)
+    public function login_view($title)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $last_name = ucfirst(strtolower(trim($_POST['last_name'])) );
-            $first_name = ucwords(strtolower($_POST['first_name']));
-            $number = str_replace(' ', '', trim($_POST['phone']));
-            if ($_POST['password'] !== $_POST['confirm-password']) {
-                echo "Passwords do not match.";
-                return;
-            }
-            $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
 
-            // Validate the input data
-            if (empty($last_name) || empty($first_name) || empty($number) || empty($password)) {
-                echo "All fields are required.";
-                return;
-            }
-
-            // Add user to the database
-            $userModel = new UserModel();
-            if ($userModel->add_user($last_name, $first_name, $number, $password)) {
-                header('Location: /login?success=1');
-                exit();
+            if ($this->userModel->verifyPassword($email, $password)) {
+                $user = $this->userModel->getUserByEmail($email);
+                Session::setUser($user);
+                
+                // Rediriger vers le tableau de bord approprié
+                if ($user['role'] === 'admin') {
+                    header('Location: /admin');
+                } elseif ($user['role'] === 'artisant') {
+                    header('Location: /author/dashboard');
+                } else {
+                    header('Location: /');
+                }
+                exit;
             } else {
-                echo "Failed to register user.";
+                $error = "Email ou mot de passe incorrect";
             }
         }
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/forms/forms_register_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
+
+        require_once __DIR__ . '/../Views/auth/login.php';
+    }
+
+    public function register_view($title)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'first_name' => $_POST['first_name'] ?? '',
+                'last_name' => $_POST['last_name'] ?? '',
+                'email' => $_POST['email'] ?? '',
+                'password' => $_POST['password'] ?? '',
+                'phone_number' => $_POST['phone_number'] ?? '',
+                'age' => $_POST['age'] ?? 0,
+                'address' => $_POST['address'] ?? '',
+                'role' => $_POST['is_artisan'] ?? false ? 'artisant' : 'user'
+            ];
+
+            // Validation simple
+            if (empty($data['first_name']) || empty($data['last_name']) || 
+                empty($data['email']) || empty($data['password']) ||
+                empty($data['phone_number'])) {
+                $error = "Tous les champs obligatoires doivent être remplis";
+            } elseif ($this->userModel->getUserByEmail($data['email'])) {
+                $error = "Cette adresse email est déjà utilisée";
+            } else {
+                if ($this->userModel->createUser($data)) {
+                    $user = $this->userModel->getUserByEmail($data['email']);
+                    
+                    // Si c'est un artisan, créer son profil d'auteur
+                    if ($data['role'] === 'artisant') {
+                        $authorData = [
+                            'user_id' => $user['id'],
+                            'bio' => $_POST['bio'] ?? null,
+                            'website' => $_POST['website'] ?? null,
+                            'social_media_links' => isset($_POST['social_media']) ? json_decode($_POST['social_media'], true) : null,
+                            'key_words' => $_POST['key_words'] ?? null
+                        ];
+                        $this->authorModel->createAuthor($authorData);
+                    }
+
+                    Session::setUser($user);
+                    
+                    // Rediriger vers le tableau de bord approprié
+                    if ($data['role'] === 'artisant') {
+                        header('Location: /author/dashboard');
+                    } else {
+                        header('Location: /');
+                    }
+                    exit;
+                } else {
+                    $error = "Une erreur est survenue lors de l'inscription";
+                }
+            }
+        }
+
+        require_once __DIR__ . '/../Views/auth/register.php';
+    }
+
+    public function logout()
+    {
+        Session::destroy();
+        header('Location: /');
+        exit;
     }
 }

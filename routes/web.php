@@ -1,5 +1,6 @@
 <?php
 
+use Core\Router;
 
 global $router;
 
@@ -22,12 +23,7 @@ use App\Controllers\WelcomeController;
  * Main Routes
  */
 
-$router->get('/', function () {
-    (new WelcomeController())->welcome_view(
-        'E-Artisanat - Accueil'
-    );
-});
-
+$router->get('/', 'WelcomeController@index');
 
 /**
  * Formular Routes
@@ -80,11 +76,9 @@ $router->get('/buy', function () {
     );
 });
 
-$router->get('/products', function () {
-    (new ProductsController())->products_view(
-        'E-Artisanat - production'
-    );
-});
+$router->get('/products', 'ProductController@index');
+$router->get('/products/category/{slug}', 'ProductController@byCategory');
+$router->get('/product/{id}', 'ProductController@show');
 
 $router->get('/product', function () {
     (new ProductsController())->product_view(
@@ -97,8 +91,6 @@ $router->get('/panier', function () {
         'E-Artisanat - panier'
     );
 });
-
-
 
 $router->get('/payer', function () {
     (new paiementController())->payer(
@@ -239,6 +231,39 @@ $router->get('/deconnexion', function () {
         'E-Artisanat - Deconnexion'
     );
 });
+
+// Routes pour le panier
+$router->get('/cart', 'CartController@index');
+$router->post('/cart/add', 'CartController@add');
+$router->post('/cart/update', 'CartController@update');
+$router->post('/cart/remove', 'CartController@remove');
+$router->post('/cart/clear', 'CartController@clear');
+
+// Routes pour les commandes
+$router->get('/orders', 'OrderController@index');
+$router->get('/order/{id}', 'OrderController@show');
+$router->get('/checkout', 'OrderController@checkout');
+$router->post('/order/create', 'OrderController@create');
+
+// Routes pour les notifications
+$router->get('/notifications', 'NotificationController@index');
+
+// Routes pour les conversations
+$router->get('/conversations', 'ConversationController@index');
+$router->get('/conversation/{id}', 'ConversationController@show');
+
+// Routes pour le profil
+$router->get('/profile', 'ProfileController@index');
+$router->get('/profile/edit', 'ProfileController@edit');
+$router->post('/profile/update', 'ProfileController@update');
+
+// Routes pour la newsletter
+$router->post('/newsletter/subscribe', 'NewsletterController@subscribe');
+
+// Routes pour les pages statiques
+$router->get('/privacy-policy', 'PageController@privacy');
+$router->get('/refund-policy', 'PageController@refund');
+$router->get('/contact', 'PageController@contact');
 
 
 

@@ -10,19 +10,19 @@ class Router
     ];
 
     // Enregistre une route GET
-    public function get(string $path, callable $handler): void
+    public function get(string $path, $handler): void
     {
         $this->addRoute('GET', $path, $handler);
     }
 
     // Enregistre une route POST
-    public function post(string $path, callable $handler): void
+    public function post(string $path, $handler): void
     {
         $this->addRoute('POST', $path, $handler);
     }
 
     // Méthode centrale pour ajouter une route
-    private function addRoute(string $method, string $path, callable $handler): void
+    private function addRoute(string $method, string $path, $handler): void
     {
         $this->routes[$method][] = [
             'path' => $this->compilePath($path),
@@ -36,6 +36,24 @@ class Router
     {
         $pattern = preg_replace('#\{(\w+)\}#', '(?P<$1>[^/]+)', $path);
         return "#^" . $pattern . "$#";
+    }
+
+    // Résout un handler de type string (Controller@method)
+    private function resolveHandler($handler)
+    {
+        if (is_callable($handler)) {
+            return $handler;
+        }
+
+        if (is_string($handler)) {
+            [$controller, $method] = explode('@', $handler);
+            $controllerClass = "App\\Controllers\\{$controller}";
+            if (class_exists($controllerClass)) {
+                return [new $controllerClass(), $method];
+            }
+        }
+
+        throw new \RuntimeException('Invalid route handler');
     }
 
     // Exécution du routeur
@@ -54,8 +72,9 @@ class Router
             if (preg_match($route['path'], $uri, $matches)) {
                 // Extraire les variables nommées
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-                // Exécute la fonction associée à la route
-                call_user_func($route['handler'], $params);
+                // Résoudre et exécuter le handler
+                $handler = $this->resolveHandler($route['handler']);
+                call_user_func($handler, $params);
                 return;
             }
         }
