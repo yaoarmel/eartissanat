@@ -1,6 +1,9 @@
 RewriteEngine On
 
-# Rediriger tout le trafic vers le dossier public
+# Autoriser l'accès direct aux assets
+RewriteRule ^assets/ - [L]
+
+# Rediriger tout le reste vers le dossier public
 RewriteCond %{REQUEST_URI} !^/public/
 RewriteRule ^(.*)$ public/$1 [L]
 

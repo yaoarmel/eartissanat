@@ -23,7 +23,10 @@ class ProfileController
         $title = 'Mon profil';
         $user = $this->userModel->getUserById($userId);
         
-        require_once __DIR__ . '/../Views/profile/index.php';
+        \App\Core\View::render('profile/index', [
+            'title' => $title,
+            'user' => $user
+        ]);
     }
 
     public function edit()
@@ -34,7 +37,10 @@ class ProfileController
         $title = 'Modifier mon profil';
         $user = $this->userModel->getUserById($userId);
         
-        require_once __DIR__ . '/../Views/profile/edit.php';
+        \App\Core\View::render('profile/edit', [
+            'title' => $title,
+            'user' => $user
+        ]);
     }
 
     public function update()

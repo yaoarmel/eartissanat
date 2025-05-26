@@ -225,19 +225,17 @@ $router->get('/test', function () {
     );
 });
 
-// Manager Session Routes 
-$router->get('/deconnexion', function () {
-    (new ManageSessionController())->logout(
-        'E-Artisanat - Deconnexion'
-    );
-});
-
 // Routes pour le panier
 $router->get('/cart', 'CartController@index');
 $router->post('/cart/add', 'CartController@add');
 $router->post('/cart/update', 'CartController@update');
 $router->post('/cart/remove', 'CartController@remove');
 $router->post('/cart/clear', 'CartController@clear');
+
+// Route pour la déconnexion
+$router->post('/logout', function() {
+    (new AuthController())->logout();
+});
 
 // Routes pour les commandes
 $router->get('/orders', 'OrderController@index');

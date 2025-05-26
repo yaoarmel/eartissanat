@@ -5,178 +5,142 @@ namespace App\Controllers;
 use App\Models\AuthorModel;
 use App\Models\ProductsCategoriesModel;
 use App\Models\ProductsModel;
+use Core\Session;
 
 class AuthorController
 {
-    public function author_view_guest(string $title)
+    private $authorModel;
+    private $productsModel;
+    private $categoriesModel;
+
+    public function __construct()
     {
-        session_start();
-        if (isset($_GET['id'])) {
-            $autorId = $_GET['id'];
-            $authorModel = new AuthorModel();
-            $user = $authorModel->get_user_by_id($autorId);
-            
-            $author = $authorModel->get_author_by_id($autorId);
+        $this->authorModel = new AuthorModel();
+        $this->productsModel = new ProductsModel();
+        $this->categoriesModel = new ProductsCategoriesModel();
+    }
+
+    public function profile($id = null)
+    {
+        $title = "Profil de l'artisan";
         
-            $keywords = $author['key_words'];
-            // Convert string(17) "{Bijoux,Qualité}" to array ['Bijoux', 'Qualité']
-            $keywords = trim($keywords, '{}');
-            $keywordsArray = array_map('trim', explode(',', $keywords));
-            
-
-            $productsModel = new ProductsModel();
-            $products = $productsModel->get($_GET['id']);
-        }
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/authors/author_view_guest.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-
-    public function author_dashboard_view(string $title)
-    {
-        session_start();
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/authors/author_layouts/author_sidebar_part.php';
-        require_once __DIR__ . '/../Views/authors/author_dashboard_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-
-// products
-    public function author_products_view(string $title)
-    {
-        session_start();
-        $productsModel = new ProductsModel();
-        $products = $productsModel->getAllProductsAndCategoriesByAuthorId($_SESSION['user']['id']);
-
-        if (isset($_GET['delete'])) {
-            
-            $productsModel->deleteProductById($_GET['delete']);
-            header('Location: /author/products');
-            exit;
-        }
-        
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/authors/author_layouts/author_sidebar_part.php';
-        require_once __DIR__ . '/../Views/authors/products/author_products_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-
-    public function author_edit_product_view(string $title)
-    {
-        session_start();
-        $categoriesModel = new ProductsCategoriesModel();
-        $categories = $categoriesModel->getAllproducts_categories();
-
-        $productsModel = new ProductsModel();
-
-        if (isset($_POST) && !empty($_POST)) {
-            $data = [
-                'id' => $_GET['id'],
-                'name' => $_POST['name'],
-                'description' => $_POST['description'],
-                'price' => $_POST['price'],
-                'stock' => $_POST['stock'],
-                'category_id' => $_POST['category_id'],
-            ];
-           
-            $productsModel->editProductById($_GET['id'], $data);
-            header('Location: /author/products');
-            exit;
-        }
-
-        
-        $product = $productsModel->getProductById($_GET['id']);
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/authors/author_layouts/author_sidebar_part.php';
-        require_once __DIR__ . '/../Views/authors/products/author_edit_products_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-
-    public function author_add_product_view(string $title)
-    {
-        session_start();
-        $categoriesModel = new ProductsCategoriesModel();
-        $categories = $categoriesModel->getAllproducts_categories();
-
-        $productsModel = new ProductsModel();
-
-        if (isset($_POST) && !empty($_POST)) {
-            $data = [
-                'name' => $_POST['name'],
-                'description' => $_POST['description'],
-                'price' => $_POST['price'],
-                'stock' => $_POST['stock'],
-                'category_id' => $_POST['category_id'],
-            ];
-           
-            header('Location: /author/products');
-            exit;
-        }
-
-        
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/authors/author_layouts/author_sidebar_part.php';
-        require_once __DIR__ . '/../Views/authors/products/author_add_products_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-
-
-    
-
-
-
-
-
-    public function author_orders_view(string $title)
-    {
-        session_start();
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/authors/author_layouts/author_sidebar_part.php';
-        require_once __DIR__ . '/../Views/authors/orders/author_orders_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-    public function author_settings_view(string $title)
-    {
-        session_start();
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/authors/author_layouts/author_sidebar_part.php';
-        require_once __DIR__ . '/../Views/authors/settings/author_settings_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-
-    public function author_uploads_view(string $title)
-    {
-        session_start();
-        $uploadedFileUrl = null;
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
-            $uploadDir = __DIR__ . '/../../../public/uploads/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+        if ($id) {
+            $author = $this->authorModel->getAuthorById($id);
+            if (!$author) {
+                header('Location: /');
+                exit;
             }
-            $files = $_FILES['photos'];
-            $uploadedFiles = [];
-            for ($i = 0; $i < count($files['name']); $i++) {
-                if ($files['error'][$i] === UPLOAD_ERR_OK) {
-                    $tmpName = $files['tmp_name'][$i];
-                    $fileName = basename($files['name'][$i]);
-                    $targetPath = $uploadDir . $fileName;
-                    if (move_uploaded_file($tmpName, $targetPath)) {
-                        $uploadedFiles[] = '/uploads/' . $fileName;
-                    }
-                }
-            }
-            if (!empty($uploadedFiles)) {
-                $uploadedFileUrl = $uploadedFiles; // tableau des URLs uploadées
-                var_dump($uploadedFiles);
-                
-            }
-            exit;
-
+            $products = $this->productsModel->getProductsByAuthor($id);
         }
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/authors/author_layouts/author_sidebar_part.php';
-        require_once __DIR__ . '/../Views/authors/products/author_uploads_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
+        
+        \App\Core\View::render('authors/profile', [
+            'title' => $title,
+            'author' => $author ?? null,
+            'products' => $products ?? []
+        ]);
     }
 
+    public function dashboard()
+    {
+        $this->checkAuthorAccess();
+        $title = "Tableau de bord";
+        
+        $authorId = Session::get('author_id');
+        $stats = [
+            'total_products' => $this->productsModel->getAuthorProductsCount($authorId),
+            'total_sales' => $this->productsModel->getAuthorSalesCount($authorId),
+            'pending_orders' => $this->productsModel->getAuthorPendingOrdersCount($authorId)
+        ];
+        
+        \App\Core\View::render('authors/dashboard', [
+            'title' => $title,
+            'stats' => $stats
+        ]);
+    }
+
+    public function products()
+    {
+        $this->checkAuthorAccess();
+        $title = "Mes produits";
+        
+        $authorId = Session::get('author_id');
+        $products = $this->productsModel->getProductsByAuthor($authorId);
+        
+        \App\Core\View::render('authors/products', [
+            'title' => $title,
+            'products' => $products,
+            'sidebar' => $this->render('authors/partials/sidebar')
+        ]);
+    }
+
+    public function editProduct($id = null)
+    {
+        $this->checkAuthorAccess();
+        $title = $id ? "Modifier le produit" : "Ajouter un produit";
+        
+        $authorId = Session::get('author_id');
+        $categories = $this->categoriesModel->getAllproducts_categories();
+        
+        if ($id) {
+            $product = $this->productsModel->getProductById($id);
+            if (!$product || $product['author_id'] !== $authorId) {
+                header('Location: /author/products');
+                exit;
+            }
+        }
+        
+        \App\Core\View::render('authors/edit_product', [
+            'title' => $title,
+            'product' => $product ?? null,
+            'categories' => $categories,
+            'sidebar' => $this->render('authors/partials/sidebar')
+        ]);
+    }
+
+    public function orders()
+    {
+        $this->checkAuthorAccess();
+        $title = "Mes commandes";
+        
+        $authorId = Session::get('author_id');
+        $orders = $this->productsModel->getAuthorOrders($authorId);
+        
+        \App\Core\View::render('authors/orders', [
+            'title' => $title,
+            'orders' => $orders,
+            'sidebar' => $this->render('authors/partials/sidebar')
+        ]);
+    }
+
+    public function settings()
+    {
+        $this->checkAuthorAccess();
+        $title = "Paramètres";
+        
+        $authorId = Session::get('author_id');
+        $author = $this->authorModel->getAuthorById($authorId);
+        
+        \App\Core\View::render('authors/settings', [
+            'title' => $title,
+            'author' => $author
+        ]);
+    }
+
+    public function uploads()
+    {
+        $this->checkAuthorAccess();
+        $title = "Gestion des médias";
+        
+        \App\Core\View::render('authors/uploads', [
+            'title' => $title
+        ]);
+    }
+
+    private function checkAuthorAccess()
+    {
+        if (!Session::get('author_id')) {
+            header('Location: /login');
+            exit;
+        }
+    }
 }

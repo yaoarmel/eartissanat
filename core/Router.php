@@ -74,12 +74,9 @@ class Router
                 $file = BASE_PATH . '/public' . $uri;
                 if (file_exists($file)) {
                     $this->serveStaticFile($file);
-                    return;
+                    exit;
                 }
             }
-
-            // Démarrer la temporisation de sortie avant tout
-            ob_start();
 
             foreach ($this->routes[$method] ?? [] as $route) {
                 if (preg_match($route['path'], $uri, $matches)) {
@@ -88,29 +85,19 @@ class Router
                     
                     // Résoudre et exécuter le handler
                     $handler = $this->resolveHandler($route['handler']);
-                    $content = call_user_func($handler, $params);
-
-                    // Si le handler a retourné une chaîne, c'est le contenu
-                    if (is_string($content)) {
-                        echo $content;
-                    }
-
-                    // Récupérer le contenu
-                    $content = ob_get_clean();
-
-                    // Inclure le layout de base avec le contenu
-                    require BASE_PATH . '/app/Views/layouts/base.php';
-                    return;
+                    call_user_func($handler, $params);
+                    exit;
                 }
             }
 
-            // Aucune route trouvée
+            // Aucune route trouvée - 404
             if (!headers_sent()) {
                 http_response_code(404);
             }
-            $title = 'Page non trouvée - E-Artisanat';
-            $content = $this->render404();
-            require BASE_PATH . '/app/Views/layouts/base.php';
+            \App\Core\View::render('errors/404', [
+                'title' => 'Page non trouvée - E-Artisanat'
+            ]);
+            exit;
 
         } catch (\Exception $e) {
             // Log l'erreur
@@ -122,9 +109,11 @@ class Router
             }
             
             // Afficher la page d'erreur 500
-            $title = 'Erreur serveur - E-Artisanat';
-            $content = $this->render500();
-            require BASE_PATH . '/app/Views/layouts/base.php';
+            \App\Core\View::render('errors/500', [
+                'title' => 'Erreur serveur - E-Artisanat',
+                'error' => $e->getMessage()
+            ]);
+            exit;
         }
     }
 
@@ -153,43 +142,5 @@ class Router
             }
             readfile($file);
         }
-    }
-
-    // Génère le contenu de la page 404
-    private function render404(): string
-    {
-        ob_start();
-        ?>
-        <div class="min-h-[60vh] flex items-center justify-center">
-            <div class="text-center">
-                <h1 class="text-6xl font-bold text-green-600 mb-4">404</h1>
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Page non trouvée</h2>
-                <p class="text-gray-600 mb-8">La page que vous recherchez n'existe pas ou a été déplacée.</p>
-                <a href="/" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
-                    Retour à l'accueil
-                </a>
-            </div>
-        </div>
-        <?php
-        return ob_get_clean();
-    }
-
-    // Génère le contenu de la page 500
-    private function render500(): string
-    {
-        ob_start();
-        ?>
-        <div class="min-h-[60vh] flex items-center justify-center">
-            <div class="text-center">
-                <h1 class="text-6xl font-bold text-red-600 mb-4">500</h1>
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Erreur interne du serveur</h2>
-                <p class="text-gray-600 mb-8">Une erreur inattendue s'est produite. Notre équipe technique a été notifiée.</p>
-                <a href="/" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
-                    Retour à l'accueil
-                </a>
-            </div>
-        </div>
-        <?php
-        return ob_get_clean();
     }
 }

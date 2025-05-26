@@ -46,7 +46,10 @@ class AdminController
             'total_products' => $this->productModel->getTotalProducts()
         ];
         
-        require_once __DIR__ . '/../Views/admin/dashboard.php';
+        \App\Core\View::render('admin/dashboard', [
+            'title' => $title,
+            'stats' => $stats
+        ]);
     }
 
     public function authors()
@@ -62,7 +65,13 @@ class AdminController
         $totalAuthors = $this->authorModel->getTotalAuthors($status);
         $totalPages = ceil($totalAuthors / $perPage);
         
-        require_once __DIR__ . '/../Views/admin/authors.php';
+        \App\Core\View::render('admin/authors', [
+            'title' => $title,
+            'authors' => $authors,
+            'totalPages' => $totalPages,
+            'currentPage' => $page,
+            'status' => $status
+        ]);
     }
 
     public function authorDetails($id)
@@ -79,7 +88,12 @@ class AdminController
         $products = $this->productModel->getProductsByAuthor($id);
         $title = "Profil de l'artisan : {$user['first_name']} {$user['last_name']}";
         
-        require_once __DIR__ . '/../Views/admin/author-details.php';
+        \App\Core\View::render('admin/author-details', [
+            'title' => $title,
+            'author' => $author,
+            'user' => $user,
+            'products' => $products
+        ]);
     }
 
     public function verifyAuthor()
@@ -99,7 +113,6 @@ class AdminController
                 $this->authorModel->verifyAuthor($authorId);
                 $_SESSION['success'] = "L'artisan a été vérifié avec succès";
             } elseif ($action === 'reject') {
-                // Implémentez la logique de rejet si nécessaire
                 $_SESSION['success'] = "L'artisan a été rejeté";
             }
         }
@@ -120,43 +133,11 @@ class AdminController
         $totalProducts = $this->productModel->getTotalProducts();
         $totalPages = ceil($totalProducts / $perPage);
         
-        require_once __DIR__ . '/../Views/admin/products.php';
-    }
-
-    public function admin_dashboard_view(string $title)
-    {
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/administrators/admin_layouts/admin_sidebar_part.php';
-        require_once __DIR__ . '/../Views/administrators/admin_dashboard_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-
-    public function admin_users_view(string $title)
-    {
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/administrators/admin_layouts/admin_sidebar_part.php';
-        require_once __DIR__ . '/../Views/administrators/users/admin_users_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-    public function admin_products_view(string $title)
-    {
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/administrators/admin_layouts/admin_sidebar_part.php';
-        require_once __DIR__ . '/../Views/administrators/products/admin_products_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-    public function admin_orders_view(string $title)    
-    {
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/administrators/admin_layouts/admin_sidebar_part.php';
-        require_once __DIR__ . '/../Views/administrators/orders/admin_orders_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
-    }
-    public function admin_settings_view(string $title)
-    {
-        require_once __DIR__ . '/../Views/layouts/layouts_header_part.php';
-        require_once __DIR__ . '/../Views/administrators/admin_layouts/admin_sidebar_part.php';
-        require_once __DIR__ . '/../Views/administrators/settings/admin_settings_view.php';
-        require_once __DIR__ . '/../Views/layouts/layouts_footer_part.php';
+        \App\Core\View::render('admin/products', [
+            'title' => $title,
+            'products' => $products,
+            'totalPages' => $totalPages,
+            'currentPage' => $page
+        ]);
     }
 }

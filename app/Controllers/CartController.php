@@ -20,14 +20,29 @@ class CartController
 
     public function index()
     {
-        AuthMiddleware::isAuthenticated();
-        $userId = Session::getUserId();
-        
         $title = 'Mon panier';
-        $cartItems = $this->cartModel->getCartItems($userId);
-        $total = $this->cartModel->getCartTotal($userId);
-        
-        require_once __DIR__ . '/../Views/cart/index.php';
+        $cart = Session::get('cart', []);
+        $total = 0;
+        $products = [];
+
+        if (!empty($cart)) {
+            foreach ($cart as $productId => $quantity) {
+                $product = $this->productModel->getProductById($productId);
+                if ($product) {
+                    $products[] = [
+                        'product' => $product,
+                        'quantity' => $quantity
+                    ];
+                    $total += $product['price'] * $quantity;
+                }
+            }
+        }
+
+        \App\Core\View::render('cart/index', [
+            'title' => $title,
+            'products' => $products,
+            'total' => $total
+        ]);
     }
 
     public function add()
@@ -110,5 +125,39 @@ class CartController
 
         header('Location: /cart');
         exit;
+    }
+
+    public function checkout()
+    {
+        AuthMiddleware::isAuthenticated();
+        $title = 'Finaliser la commande';
+        $cart = Session::get('cart', []);
+        
+        if (empty($cart)) {
+            header('Location: /cart');
+            exit;
+        }
+
+        $total = 0;
+        $products = [];
+        foreach ($cart as $productId => $quantity) {
+            $product = $this->productModel->getProductById($productId);
+            if ($product) {
+                $products[] = [
+                    'product' => $product,
+                    'quantity' => $quantity
+                ];
+                $total += $product['price'] * $quantity;
+            }
+        }
+
+        $user = $this->userModel->getUserById(Session::getUserId());
+
+        \App\Core\View::render('cart/checkout', [
+            'title' => $title,
+            'products' => $products,
+            'total' => $total,
+            'user' => $user
+        ]);
     }
 } 

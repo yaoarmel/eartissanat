@@ -7,13 +7,17 @@ class PageController
     public function privacy()
     {
         $title = 'Politique de confidentialité';
-        require_once __DIR__ . '/../Views/pages/privacy.php';
+        \App\Core\View::render('pages/privacy', [
+            'title' => $title
+        ]);
     }
 
     public function refund()
     {
         $title = 'Politique de remboursement';
-        require_once __DIR__ . '/../Views/pages/refund.php';
+        \App\Core\View::render('pages/refund', [
+            'title' => $title
+        ]);
     }
 
     public function contact()
@@ -37,6 +41,8 @@ class PageController
             }
         }
 
-        require_once __DIR__ . '/../Views/pages/contact.php';
+        \App\Core\View::render('pages/contact', [
+            'title' => $title
+        ]);
     }
 } 

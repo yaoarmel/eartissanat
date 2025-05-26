@@ -23,7 +23,10 @@ class NotificationController
         $title = 'Mes notifications';
         $notifications = $this->notificationModel->getUserNotifications($userId);
         
-        require_once __DIR__ . '/../Views/notifications/index.php';
+        \App\Core\View::render('notifications/index', [
+            'title' => $title,
+            'notifications' => $notifications
+        ]);
     }
 
     public function markAsRead()

@@ -23,7 +23,10 @@ class ConversationController
         $title = 'Mes conversations';
         $conversations = $this->conversationModel->getUserConversations($userId);
         
-        require_once __DIR__ . '/../Views/conversations/index.php';
+        \App\Core\View::render('conversations/index', [
+            'title' => $title,
+            'conversations' => $conversations
+        ]);
     }
 
     public function show($id)
@@ -42,7 +45,11 @@ class ConversationController
                                        $conversation['sender_name']);
         $messages = $this->conversationModel->getMessages($id);
         
-        require_once __DIR__ . '/../Views/conversations/show.php';
+        \App\Core\View::render('conversations/show', [
+            'title' => $title,
+            'conversation' => $conversation,
+            'messages' => $messages
+        ]);
     }
 
     public function sendMessage()

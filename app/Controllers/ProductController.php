@@ -40,7 +40,14 @@ class ProductController
         $totalPages = ceil($totalProducts / $perPage);
         $categories = $this->categoryModel->getAllCategories();
 
-        require_once __DIR__ . '/../Views/products/index.php';
+        \App\Core\View::render('products/index', [
+            'title' => $title,
+            'products' => $products,
+            'categories' => $categories,
+            'totalPages' => $totalPages,
+            'currentPage' => $page,
+            'category' => $category ?? null
+        ]);
     }
 
     public function show($id)
@@ -54,7 +61,11 @@ class ProductController
         $author = $this->authorModel->getAuthorById($product['author_id']);
         $title = $product['name'];
 
-        require_once __DIR__ . '/../Views/products/show.php';
+        \App\Core\View::render('products/show', [
+            'title' => $title,
+            'product' => $product,
+            'author' => $author
+        ]);
     }
 
     public function create()
