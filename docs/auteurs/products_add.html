@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un produit - Auteur | E-Artisanat</title>
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow sticky top-0 z-50">
+        <div class="max-w-screen-xl mx-auto px-8 py-5 flex justify-between items-center">
+            <div class="text-2xl font-extrabold text-green-600 tracking-wide"><a href="/index.html">E-Artisanat Auteur</a></div>
+            <nav class="flex items-center gap-5 text-lg font-medium">
+                <a href="#" class="text-gray-700 hover:text-green-600 transition flex items-center" aria-label="Notifications">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-green-600 transition flex items-center" aria-label="Compte">
+                    <i class="fa-regular fa-user text-xl"></i>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="flex flex-1">
+        <!-- Sidebar -->
+        <aside class="bg-white w-64 min-h-screen shadow-lg hidden md:block">
+            <nav class="flex flex-col gap-2 p-6">
+                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100"></a>
+                    <i class="fa-solid fa-gauge"></i> Tableau de bord
+                </a>
+                <a href="products.html" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-box"></i> Mes produits
+                </a>
+                <a href="orders.html" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-shopping-cart"></i> Mes commandes
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-comments"></i> Messages
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-cog"></i> Paramètres
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+   <main class="flex-1 p-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+                <h1 class="text-3xl font-bold">Ajouter un produit</h1>
+                <a href="products.html" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+
+            <!-- Edit Product Form -->
+            <div class="bg-white rounded-xl shadow p-6 max-w-2xl mx-auto">
+                <form>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2" for="productName">Nom du produit</label>
+                        <input type="text" id="productName" name="productName" value="Pagne tissé" class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2" for="category">Catégorie</label>
+                        <select id="category" name="category" class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                            <option value="Textile" selected>Textile</option>
+                            <option value="Bijoux">Bijoux</option>
+                            <option value="Décoration">Décoration</option>
+                            <option value="Accessoires">Accessoires</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2" for="price">Prix (FCFA)</label>
+                        <input type="number" id="price" name="price" value="15000" class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2" for="stock">Stock</label>
+                        <input type="number" id="stock" name="stock" value="8" class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2" for="description">Description</label>
+                        <textarea id="description" name="description" rows="4" class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">Un pagne tissé artisanal de grande qualité.</textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block font-semibold mb-2">Image du produit</label>
+                        <input type="file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"/>
+                        <div class="mt-2">
+                            <img src="https://via.placeholder.com/120x80?text=Image" alt="Aperçu" class="h-20 rounded shadow border">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2" for="dimensions">Dimensions</label>
+                        <input type="text" id="dimensions" name="dimensions" placeholder="60cm x 80cm" class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2" for="material">Materiaux</label>
+                        <input type="text" id="material" name="material" value="" placeholder="Bois..." class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2" for="origin">Origine</label>
+                        <input type="text" id="origin" name="origin" value="" placeholder="Cote d'Ivoire" class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <input type="text" name="author_id" value="" class="hidden">
+                    <div class="flex justify-end gap-4">
+                        <a href="products.html" class="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">Annuler</a>
+                        <button type="submit" class="px-5 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">Enregistrer</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-300 mt-12 py-6"></footer>
+        <div class="max-w-screen-xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center flex-wrap gap-4"></div>
+            <span class="font-medium text-gray-800">© 2024 E-Artisanat. Tous droits réservés.</span>
+            <div class="flex space-x-6 text-center"></div>
+                <a href="#" class="text-gray-700 hover:text-gray-900 transition">Politique de confidentialité</a>
+                <a href="#" class="text-gray-700 hover:text-gray-900 transition">Politique de remboursement</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

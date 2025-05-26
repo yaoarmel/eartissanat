@@ -1,0 +1,29 @@
+#Pour ajouter une nouvelle page au site web, suivez les étapes ci-dessous :
+
+1. Allez dans le répertoire '/static/'.
+2. Choisissez la page dont vous souhaitez ajouter le contenu.
+3. Copiez la section <main> ... </main> de cette page.
+
+4. Rendez-vous dans le dossier 'app/Views/'.
+5. Créez un nouveau fichier avec le nom de la page à ajouter (ex : MaNouvellePage.php).
+6. Collez la section <main> copiée précédemment dans ce fichier.
+
+7. Accédez au dossier 'app/Controllers/'.
+8. Créez un fichier portant le même nom que celui créé dans 'app/Views/' (ex : MaNouvellePageController.php).
+9. Dans ce fichier, créez une classe du même nom (ex : MaNouvellePageController) en vous inspirant du fichier 'HomeController.php'.
+
+10. Définissez la route :
+  - Ouvrez le fichier '/routes/web.php'.
+  - Ajoutez une nouvelle route pour votre page, en suivant le modèle des routes déjà présentes.
+
+Votre nouvelle page est maintenant accessible depuis le site web.
+
+
+
+
+#Pour lancer Docker
+1. lancer le logiciel Docker
+2. aller dans vscode 
+3. ouvrir le terminal
+4. taper la commande suivante : docker-compose up -d
+5. aller dans le navigateur et taper l'adresse suivante : http://localhost

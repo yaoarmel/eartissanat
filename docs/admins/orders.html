@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commandes - Admin - E-Artisanat</title>
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow sticky top-0 z-50">
+        <div class="max-w-screen-xl mx-auto px-8 py-5 flex justify-between items-center">
+            <div class="text-2xl font-extrabold text-green-600 tracking-wide"><a href="/index.html">E-Artisanat Admin</a></div>
+            <nav class="flex items-center gap-5 text-lg font-medium">
+                <a href="#" class="text-gray-700 hover:text-green-600 transition flex items-center" aria-label="Notifications">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-green-600 transition flex items-center" aria-label="Compte">
+                    <i class="fa-regular fa-user text-xl"></i>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="flex flex-1">
+        <!-- Sidebar -->
+        <aside class="bg-white w-64 min-h-screen shadow-lg hidden md:block">
+            <nav class="flex flex-col gap-2 p-6">
+                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-gauge"></i> Tableau de bord
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-users"></i> Utilisateurs
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-box"></i> Produits
+                </a>
+                <a href="orders.html" class="flex items-center gap-3 px-4 py-2 rounded text-green-700 bg-green-100 font-semibold">
+                    <i class="fa-solid fa-shopping-cart"></i> Commandes
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-comments"></i> Messages
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100">
+                    <i class="fa-solid fa-cog"></i> Paramètres
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            <h1 class="text-3xl font-bold mb-8">Commandes</h1>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-xl font-bold mb-4">Dernières commandes</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-4 font-semibold">ID</th>
+                                <th class="py-2 px-4 font-semibold">Client</th>
+                                <th class="py-2 px-4 font-semibold">Montant</th>
+                                <th class="py-2 px-4 font-semibold">Statut</th>
+                                <th class="py-2 px-4 font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t">
+                                <td class="py-2 px-4">#1023</td>
+                                <td class="py-2 px-4">Jean M.</td>
+                                <td class="py-2 px-4">35 000 FCFA</td>
+                                <td class="py-2 px-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Livrée</span></td>
+                                <td class="py-2 px-4">
+                                    <button class="text-blue-600 hover:underline mr-2">Voir</button>
+                                    <button class="text-red-600 hover:underline">Annuler</button>
+                                </td>
+                            </tr>
+                            <tr class="border-t">
+                                <td class="py-2 px-4">#1022</td>
+                                <td class="py-2 px-4">Fatou K.</td>
+                                <td class="py-2 px-4">40 000 FCFA</td>
+                                <td class="py-2 px-4"><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">En attente</span></td>
+                                <td class="py-2 px-4">
+                                    <button class="text-blue-600 hover:underline mr-2">Voir</button>
+                                    <button class="text-red-600 hover:underline">Annuler</button>
+                                </td>
+                            </tr>
+                            <!-- More rows as needed -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-300 mt-12 py-6">
+        <div class="max-w-screen-xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center flex-wrap gap-4">
+            <span class="font-medium text-gray-800">© 2024 E-Artisanat. Tous droits réservés.</span>
+            <div class="flex space-x-6 text-center">
+                <a href="#" class="text-gray-700 hover:text-gray-900 transition">Politique de confidentialité</a>
+                <a href="#" class="text-gray-700 hover:text-gray-900 transition">Politique de remboursement</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
